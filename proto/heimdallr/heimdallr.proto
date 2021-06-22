@@ -1,0 +1,36 @@
+syntax = "proto3";
+
+package heimdallr;
+
+option go_package = "heimdallr";
+
+message ClientIdRequest {
+  string clientId = 1;
+}
+
+message AuthRequest {
+  string jwtToken = 1;
+}
+
+message KeyPairResponse {
+  string privateKey = 1;
+}
+
+message ResultResponse {
+  bool success = 1;
+}
+
+message EmptyReq {}
+
+message ClientIdsResponse {
+  repeated string ids = 1;
+}
+
+service HeimdallrService {
+  rpc CreateClient(ClientIdRequest) returns (KeyPairResponse) {}
+  rpc Authenticate(AuthRequest) returns (ResultResponse) {}
+  rpc RegenerateKeys(ClientIdRequest) returns (KeyPairResponse) {}
+  rpc AddToBlacklist(ClientIdRequest) returns (ResultResponse) {}
+  rpc GetBlacklist(EmptyReq) returns (ClientIdsResponse) {}
+  rpc DeleteClient(ClientIdRequest) returns (ResultResponse) {}
+}
