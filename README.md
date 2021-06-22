@@ -4,9 +4,6 @@
 
 ## TODO
 
-- Setup
-- DBs
-- Define proto
 - Create
 - Read
 - Update

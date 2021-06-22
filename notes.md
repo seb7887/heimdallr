@@ -25,4 +25,3 @@ Operations:
 DB:
 
 - Redis
-- PostgreSQL
