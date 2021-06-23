@@ -8,3 +8,5 @@
 - Read
 - Update
 - Delete
+- Authenticate
+- GRPC Auth

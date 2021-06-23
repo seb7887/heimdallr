@@ -7,8 +7,8 @@ import (
 )
 
 type Client struct {
-	clientId  string
-	publicKey string
+	ClientId  string
+	PublicKey string
 }
 
 type Repository interface {
@@ -43,6 +43,13 @@ func (r redisRepository) Health(ctx context.Context) error {
 }
 
 func (r redisRepository) CreateClient(ctx context.Context, client *Client) error {
-	// TODO
-	return nil
+	// get a connection
+	conn, err := r.pool.GetContext(ctx)
+	if err != nil {
+		return err
+	}
+
+	// set a new key/value pair
+	_, err = conn.Do("SET", client.ClientId, client.PublicKey)
+	return err
 }
