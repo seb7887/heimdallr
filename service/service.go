@@ -8,12 +8,16 @@ import (
 	"crypto/rand"
 	"crypto/x509"
 	"encoding/pem"
+	"fmt"
 
 	"github.com/seb7887/heimdallr/storage"
 )
 
 type Service interface {
 	Create(ctx context.Context, clientId string) (*string, error)
+	UpdateBlacklist(ctx context.Context, clientId string) error
+	ReadBlacklist(ctx context.Context) ([]string, error)
+	Delete(ctx context.Context, clientId string) error
 }
 
 type service struct {
@@ -92,4 +96,35 @@ func (s *service) Create(ctx context.Context, clientId string) (*string, error) 
 	}
 
 	return &keyPair.privateKey, nil
+}
+
+func (s *service) UpdateBlacklist(ctx context.Context, clientId string) error {
+	blacklist, err := s.repository.GetBlacklist(ctx)
+	if err != nil {
+		return err
+	}
+
+	if exists(blacklist, clientId) {
+		return fmt.Errorf("Client is already a member") 
+	}
+	blacklist = append(blacklist, clientId)
+
+	return s.repository.UpsertBlacklist(ctx, blacklist)
+}
+
+func (s *service) ReadBlacklist(ctx context.Context) ([]string, error) {
+	return s.repository.GetBlacklist(ctx)
+}
+
+func (s *service) Delete(ctx context.Context, clientId string) error {
+	return s.repository.DeleteClient(ctx, clientId)
+}
+
+func exists(arr []string, value string) bool {
+	for _, item := range arr {
+		if item == value {
+			return true
+		}
+	}
+	return false
 }

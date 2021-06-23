@@ -35,17 +35,37 @@ func (h heimdallrGRPCHandler) Authenticate(ctx context.Context, req *hrpc.AuthRe
 }
 
 func (h heimdallrGRPCHandler) RegenerateKeys(ctx context.Context, req *hrpc.ClientIdRequest) (*hrpc.KeyPairResponse, error) {
-	return &hrpc.KeyPairResponse{PrivateKey: "hoiuhiou"}, nil
+	privateKey, err := h.grpcService.Create(ctx, req.ClientId)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &hrpc.KeyPairResponse{
+		PrivateKey: *privateKey,
+	}, nil
 }
 
 func (h heimdallrGRPCHandler) AddToBlacklist(ctx context.Context, req *hrpc.ClientIdRequest) (*hrpc.ResultResponse, error) {
+	if err := h.grpcService.UpdateBlacklist(ctx, req.ClientId); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	
 	return &hrpc.ResultResponse{Success: true}, nil
 }
 
 func (h heimdallrGRPCHandler) GetBlacklist(ctx context.Context, req *hrpc.EmptyReq) (*hrpc.ClientIdsResponse, error) {
-	return &hrpc.ClientIdsResponse{}, nil
+	blacklist, err := h.grpcService.ReadBlacklist(ctx)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &hrpc.ClientIdsResponse{Ids: blacklist}, nil
 }
 
 func (h heimdallrGRPCHandler) DeleteClient(ctx context.Context, req *hrpc.ClientIdRequest) (*hrpc.ResultResponse, error) {
+	if err := h.grpcService.Delete(ctx, req.ClientId); err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &hrpc.ResultResponse{Success: true}, nil
 }
