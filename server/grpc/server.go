@@ -4,7 +4,9 @@ import (
 	"context"
 	"net"
 
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	hrpc "github.com/seb7887/heimdallr/proto/heimdallr"
+	"github.com/seb7887/heimdallr/server/grpc/interceptor"
 	"github.com/seb7887/heimdallr/service"
 	"google.golang.org/grpc"
 )
@@ -31,7 +33,7 @@ func (s *grpcServer) Serve(ctx context.Context) error {
 		return err
 	}
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(withUnaryInterceptor())
 	serviceServer := NewHeimdallrGRPCServer(s.grpcService)
 
 	hrpc.RegisterHeimdallrServiceServer(grpcServer, serviceServer)
@@ -41,4 +43,10 @@ func (s *grpcServer) Serve(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func withUnaryInterceptor() grpc.ServerOption {
+	return grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
+		interceptor.AuthorizationInterceptor,
+	))
 }

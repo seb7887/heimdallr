@@ -4,9 +4,4 @@
 
 ## TODO
 
-- Create
-- Read
-- Update
-- Delete
-- Authenticate
-- GRPC Auth
+- Docs

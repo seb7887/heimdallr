@@ -15,6 +15,7 @@ type Config struct {
 	HealthPort int    `env:"HEALTH_PORT" default:"7000" json:"healthPort"`
 	GRPCPort   int    `env:"GRPC_PORT" default:"7001" json:"grpcPort"`
 	RedisHost  string `env:"REDIS_HOST" default:":6379" json:"redisHost"`
+	APIKey     string `env:"API_KEY" default:"" json:"apiKey"`
 }
 
 var _config *Config
