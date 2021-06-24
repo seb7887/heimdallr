@@ -9,7 +9,8 @@ message ClientIdRequest {
 }
 
 message AuthRequest {
-  string jwtToken = 1;
+  string clientId = 1;
+  string jwtToken = 2;
 }
 
 message KeyPairResponse {

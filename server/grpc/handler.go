@@ -24,14 +24,15 @@ func (h heimdallrGRPCHandler) CreateClient(ctx context.Context, req *hrpc.Client
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
+
 	return &hrpc.KeyPairResponse{
 		PrivateKey: *privateKey,
 	}, nil
 }
 
 func (h heimdallrGRPCHandler) Authenticate(ctx context.Context, req *hrpc.AuthRequest) (*hrpc.ResultResponse, error) {
-	return &hrpc.ResultResponse{Success: true}, nil
+	authenticated := h.grpcService.Authenticate(ctx, req.ClientId, req.JwtToken)
+	return &hrpc.ResultResponse{Success: authenticated}, nil
 }
 
 func (h heimdallrGRPCHandler) RegenerateKeys(ctx context.Context, req *hrpc.ClientIdRequest) (*hrpc.KeyPairResponse, error) {
@@ -49,7 +50,7 @@ func (h heimdallrGRPCHandler) AddToBlacklist(ctx context.Context, req *hrpc.Clie
 	if err := h.grpcService.UpdateBlacklist(ctx, req.ClientId); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	
+
 	return &hrpc.ResultResponse{Success: true}, nil
 }
 

@@ -14,13 +14,13 @@ type GRPCServer interface {
 }
 
 type grpcServer struct {
-	grpcAddr string
+	grpcAddr    string
 	grpcService service.Service
 }
 
 func New(addr string, service service.Service) GRPCServer {
 	return &grpcServer{
-		grpcAddr: addr,
+		grpcAddr:    addr,
 		grpcService: service,
 	}
 }

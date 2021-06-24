@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/gomodule/redigo/redis"
@@ -22,7 +23,7 @@ type Repository interface {
 	GetClientKey(ctx context.Context, clientId string) ([]byte, error)
 	DeleteClient(ctx context.Context, clientId string) error
 	UpsertBlacklist(ctx context.Context, newBlacklist []string) error
-	GetBlacklist(ctx context.Context) ([]string, error) 
+	GetBlacklist(ctx context.Context) ([]string, error)
 }
 
 type redisRepository struct {
@@ -72,6 +73,9 @@ func (r redisRepository) GetClientKey(ctx context.Context, clientId string) ([]b
 
 	data, err := redis.Bytes(conn.Do("GET", clientId))
 	if err != nil {
+		if err == redis.ErrNil {
+			return nil, fmt.Errorf("Client does not exist")
+		}
 		return nil, err
 	}
 
@@ -87,6 +91,9 @@ func (r redisRepository) DeleteClient(ctx context.Context, clientId string) erro
 
 	// delete entry
 	_, err = conn.Do("DEL", clientId)
+	if err == redis.ErrNil {
+		return fmt.Errorf("Client does not exist")
+	}
 	return err
 }
 
