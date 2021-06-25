@@ -9,8 +9,8 @@ Heimdallr uses public key (or asymmetric) authentication:
 
 Steps:
 
-- Generate the RSA key
-- Generate an RSA key with a self signed x509 certificate
+- Generate the ECDSA key
+- Generate an ECDSA key with a self signed x509 certificate
 - Generate keys
 - Store public key in database and redis
 
