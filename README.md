@@ -4,5 +4,4 @@
 
 ## TODO
 
-- CI/CD
 - Docs
