@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heimdallr-config
+  labels:
+    app: heimdallr
+data:
+  HEALTH_PORT: "7000"
+  GRPC_PORT: "7001"
+  REDIS_HOST: "redis.default.svc.cluster.local:6379"
+  API_KEY: "Rpcksf2ZjnEphYR4iFevmzw1w87lGpXf"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heimdallr
+  labels:
+    app: heimdallr
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: heimdallr
+  template:
+    metadata:
+      labels:
+        app: heimdallr
+    spec:
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      containers:
+        - name: heimdallr
+          image: seb7887/heimdallr:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http-port
+              containerPort: 7000
+            - name: grpc-port
+              containerPort: 7001
+          envFrom:
+            - configMapRef:
+                name: heimdallr-config
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http-port
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http-port
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: heimdallr
+  labels:
+    app: heimdallr
+spec:
+  selector:
+    app: heimdallr
+  ports:
+    - protocol: TCP
+      port: 7000
+      targetPort: 7000
+      name: http-port
+    - protocol: TCP
+      port: 7001
+      targetPort: 7001
+      name: grpc-port
+  type: ClusterIP
